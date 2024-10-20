@@ -150,7 +150,7 @@ const MemoryGame = () => {
                     <input
                         type="number"
                         id="maxMoves"
-                        value={maxMoves}
+                        value={initialMaxMoves}
                         disabled={gameStarted}
                         onChange={handleMaxMovesChange}
                         className="border-2 border-gray-300 rounded px-2 py-1 w-full"
