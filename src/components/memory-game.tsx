@@ -6,30 +6,33 @@ type Card = {
 };
 
 const MemoryGame = () => {
-    const [gridSize, setGridSize] = useState(4);
+    const [gridSize, setGridSize] = useState<number>(4);
     const [maxMoves, setMaxMoves] = useState<number>(5);
     const [initialMaxMoves, setInitialMaxMoves] = useState<number>(5);
     const [cards, setCards] = useState<Card[]>([]);
     const [flipped, setFlipped] = useState<number[]>([]);
     const [solved, setSolved] = useState<number[]>([]);
-    const [disabled, setDisabled] = useState(false);
-    const [won, setWon] = useState(false);
-    const [gameOver, setGameOver] = useState(false); // New state for game over
-    const [gameStarted, setGameStarted] = useState(false);
+    const [disabled, setDisabled] = useState<boolean>(false);
+    const [won, setWon] = useState<boolean>(false);
+    const [gameOver, setGameOver] = useState<boolean>(false);
+    const [gameStarted, setGameStarted] = useState<boolean>(false);
 
-    const handleGridSizeChange = (e) => {
+    // Update function for grid size
+    const handleGridSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const size = parseInt(e.target.value);
         if (size >= 2 && size <= 10) {
             setGridSize(size);
         }
     };
 
-    const handleMaxMovesChange = (e) => {
+    // Update function for max moves
+    const handleMaxMovesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const moves = parseInt(e.target.value);
         setInitialMaxMoves(moves);
         setMaxMoves(moves);
     };
 
+    // Initialize the game board
     const initializeGame = () => {
         const totalCards = gridSize * gridSize;
         const pairCount = Math.floor(totalCards / 2);
@@ -47,14 +50,15 @@ const MemoryGame = () => {
         setFlipped([]);
         setSolved([]);
         setWon(false);
-        setGameOver(false); // Reset game over state
-        setDisabled(false); // Re-enable card clicks
+        setGameOver(false);
+        setDisabled(false);
     };
 
+    // Check for match between two flipped cards
     const checkMatch = (secondId: number) => {
         const [firstId] = flipped;
         if (cards[firstId].number === cards[secondId].number) {
-            setSolved([...solved, firstId, secondId]);
+            setSolved((prevSolved) => [...prevSolved, firstId, secondId]);
             setFlipped([]);
             setDisabled(false);
         } else {
@@ -65,9 +69,10 @@ const MemoryGame = () => {
         }
     };
 
+    // Handle card click
     const handleClick = (id: number) => {
         setGameStarted(true);
-        if (disabled || won || gameOver) return; // Prevent clicks if won or game over
+        if (disabled || won || gameOver) return;
 
         if (flipped.length === 0) {
             setFlipped([id]);
@@ -76,7 +81,7 @@ const MemoryGame = () => {
 
         if (flipped.length === 1) {
             if (id !== flipped[0]) {
-                setFlipped([...flipped, id]);
+                setFlipped((prevFlipped) => [...prevFlipped, id]);
                 setDisabled(true);
                 checkMatch(id);
 
@@ -85,16 +90,18 @@ const MemoryGame = () => {
                     setMaxMoves((prevMoves) => prevMoves - 1);
                 }
             } else {
-                setFlipped([]); // Handle double-click on the same card
+                setFlipped([]);
                 setDisabled(false);
             }
         }
     };
 
+    // Determine if card is flipped
     const isFlipped = (id: number) => {
         return flipped.includes(id) || solved.includes(id);
     };
 
+    // Determine if card is solved
     const isSolved = (id: number) => {
         return solved.includes(id);
     };
@@ -112,7 +119,7 @@ const MemoryGame = () => {
             setGameOver(true);
             setDisabled(true);
         }
-    }, [maxMoves]);
+    }, [maxMoves, gameStarted]);
 
     // Initialize game on gridSize change or reset
     useEffect(() => {
@@ -126,7 +133,7 @@ const MemoryGame = () => {
             {/* Input */}
             <div className="flex flex-col gap-3">
                 <div>
-                    <label htmlFor="" className="mr-2">Grid Size:</label>
+                    <label htmlFor="gridSize" className="mr-2">Grid Size:</label>
                     <input
                         type="number"
                         id="gridSize"
@@ -139,7 +146,7 @@ const MemoryGame = () => {
                 </div>
 
                 <div>
-                    <label htmlFor="" className="mr-2">Max Moves (0 for unlimited)</label>
+                    <label htmlFor="maxMoves" className="mr-2">Max Moves (0 for unlimited)</label>
                     <input
                         type="number"
                         id="maxMoves"
@@ -202,7 +209,7 @@ const MemoryGame = () => {
                 onClick={initializeGame}
                 className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
-                {won || (gameOver) ? "Play Again" : "Reset"}
+                {won || gameOver ? "Play Again" : "Reset"}
             </button>
         </div>
     );
